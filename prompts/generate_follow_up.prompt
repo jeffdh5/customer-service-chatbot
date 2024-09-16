@@ -1,0 +1,17 @@
+---
+model: openai/gpt-4o
+input:
+  schema:
+    inquiry: string
+    response: string
+output:
+  schema:
+    type: string
+---
+Generate a follow-up question based on the customer inquiry and the provided response. The follow-up question should aim to gather more information or ensure the customer's needs have been fully met.
+
+Customer inquiry: {{inquiry}}
+
+Response: {{response}}
+
+Follow-up question:

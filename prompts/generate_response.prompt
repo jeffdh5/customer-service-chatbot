@@ -1,0 +1,15 @@
+---
+model: openai/gpt-4o
+input:
+  schema:
+    inquiry: string
+    classification: string
+output:
+  schema:
+    response: string
+---
+Generate a helpful and professional response to the following customer inquiry. The inquiry has been classified as {{classification}}.
+
+Customer inquiry: {{inquiry}}
+
+Response: 

@@ -1,0 +1,14 @@
+---
+model: openai/gpt-4o
+input:
+  schema:
+    inquiry: string
+output:
+  schema:
+    type: string
+---
+Classify the following customer inquiry into one of these categories: general, technical, billing, or complaint.
+
+Customer inquiry: {{inquiry}}
+
+Classification:
