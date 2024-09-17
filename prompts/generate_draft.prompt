@@ -1,0 +1,39 @@
+---
+model: vertexai/gemini-1.5-flash
+input:
+  schema:
+    type: object
+    properties:
+      category: 
+        type: string
+      productName: 
+        type: string
+      orderNumber: 
+        type: string
+      customerName: 
+        type: string
+      issue: 
+        type: string
+output:
+  schema:
+    type: object
+    properties:
+      draftResponse: 
+        type: string
+---
+Generate a draft response for the following customer inquiry:
+
+Category: {{category}}
+Product Name: {{productName}}
+Order Number: {{orderNumber}}
+Customer Name: {{customerName}}
+Main Issue: {{issue}}
+
+Relevant Information:
+Product Details: {{relevantInfo.productDetails}}
+Policy Information: {{relevantInfo.policyInfo}}
+Additional Information: {{relevantInfo.additionalInfo}}
+
+Please create a helpful and empathetic draft response addressing the customer's concerns. Include relevant details from the extracted and retrieved information:
+
+Draft Response:

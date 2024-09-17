@@ -1,11 +1,14 @@
 ---
-model: openai/gpt-4o
+model: vertexai/gemini-1.5-flash
 input:
   schema:
     inquiry: string
 output:
   schema:
-    type: string
+    type: object
+    properties:
+      category:
+        type: string
 ---
 Classify the following customer inquiry into one of these categories: general, technical, billing, or complaint.
 

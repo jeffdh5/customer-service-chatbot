@@ -1,0 +1,29 @@
+---
+model: vertexai/gemini-1.5-flash
+input:
+  schema:
+    type: object
+    properties:
+      draftResponse:
+        type: string
+      category:
+        type: string
+output:
+  schema:
+    type: object
+    properties:
+      response: 
+        type: string
+---
+Refine and format the following draft response:
+
+Category: {{category}}
+Draft Response: {{draftResponse}}
+
+Please improve the response by:
+1. Ensuring a professional and friendly tone
+2. Adding any missing information or clarifications
+3. Formatting the response for readability (e.g., paragraphs, bullet points)
+4. Including a polite closing
+
+Refined Response:
