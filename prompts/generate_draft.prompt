@@ -4,15 +4,13 @@ input:
   schema:
     type: object
     properties:
-      category: 
+      intent: 
         type: string
-      productName: 
+      subintent: 
         type: string
-      orderNumber: 
+      inquiry: 
         type: string
-      customerName: 
-        type: string
-      issue: 
+      context:
         type: string
 output:
   schema:
@@ -23,17 +21,22 @@ output:
 ---
 Generate a draft response for the following customer inquiry:
 
-Category: {{category}}
-Product Name: {{productName}}
-Order Number: {{orderNumber}}
-Customer Name: {{customerName}}
-Main Issue: {{issue}}
+Intent: {{intent}}
+Subintent: {{subintent}}
+Customer Inquiry: {{inquiry}}
+Context: {{context}}
 
-Relevant Information:
-Product Details: {{relevantInfo.productDetails}}
-Policy Information: {{relevantInfo.policyInfo}}
-Additional Information: {{relevantInfo.additionalInfo}}
+{% if escalate %}
+This inquiry needs to be escalated to a human representative.
+{% endif %}
 
-Please create a helpful and empathetic draft response addressing the customer's concerns. Include relevant details from the extracted and retrieved information:
+Please create a helpful and empathetic draft response addressing the customer's concerns. Include relevant details from the provided information based on the intent and subintent:
+
+1. For Catalog/GeneralQuestion: Provide an overview of the catalog or answer general questions about products.
+2. For Product/GeneralQuestion: Answer general questions about the specific product, using the product information provided.
+3. For Product/StockAvailability: Inform the customer about the stock status of the requested product.
+4. For Other/Other: Politely inform the customer that their inquiry will be escalated to a specialist for further assistance.
+
+Ensure the tone is professional, friendly, and tailored to the customer's needs.
 
 Draft Response:

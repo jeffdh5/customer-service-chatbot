@@ -8,24 +8,40 @@ output:
   schema:
     type: object
     properties:
-      productName: 
+      productId: 
         type: string
-      orderNumber: 
+      orderId: 
         type: string
-      customerName: 
+      customerId: 
         type: string
       issue: 
         type: string
 ---
-Extract key information from the following customer inquiry:
+
+### TASK
+Extract key information from the following customer inquiry.
+
+Please provide the following information:
+- Product ID (if mentioned)
+- Order ID (if mentioned)
+- Customer ID (if mentioned)
+- Main issue or question
+
+Important: If any of the requested information is not available in the inquiry, provide an empty string for that field. Do NOT invent or hallucinate any information.
+
+### CUSTOMER INQUIRY CONTEXT
+
+This is the inquiry information.
 
 Category: {{category}}
 Inquiry: {{inquiry}}
 
-Please provide the following information:
-- Product name (if mentioned)
-- Order number (if mentioned)
-- Customer name
-- Main issue or question
+### EXAMPLE OUTPUT 
+{
+  "productId": "PROD123",
+  "orderId": "ORD456",
+  "customerId": "",
+  "issue": "When will my order be delivered?"
+}
 
 Extracted Information:

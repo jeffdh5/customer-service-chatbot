@@ -7,10 +7,33 @@ output:
   schema:
     type: object
     properties:
-      category:
+      intent:
+        type: string
+      subintent:
         type: string
 ---
-Classify the following customer inquiry into one of these categories: general, technical, billing, or complaint.
+Classify the following customer inquiry into one of these intent/subintent pairs:
+- Catalog/GeneralQuestion
+- Catalog/ProductAvailability
+- Product/GeneralQuestion
+- Product/StockAvailability
+- Product/PriceInquiry
+- Order/GeneralQuestion
+- Order/TrackingStatus
+- Order/CancellationRequest
+- Returns/ProcessInquiry
+- Returns/RefundStatus
+- Shipping/DeliveryTimeframe
+- Shipping/CostInquiry
+- Account/LoginIssue
+- Account/UpdateInformation
+- Payment/MethodInquiry
+- Payment/TransactionIssue
+- Warranty/CoverageInquiry
+- Warranty/ClaimProcess
+- Feedback/ProductReview
+- Feedback/CustomerService
+- Other/Other
 
 Customer inquiry: {{inquiry}}
 
