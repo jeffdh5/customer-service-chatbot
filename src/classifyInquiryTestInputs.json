@@ -1,0 +1,6 @@
+[
+  { "inquiry": "I want to return a product I bought last week" },
+  { "inquiry": "What's the status of my order?" },
+  { "inquiry": "Do you have this shirt in blue?" },
+  { "inquiry": "I need help setting up my account" }
+]

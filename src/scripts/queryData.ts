@@ -28,7 +28,7 @@ async function getOrderDetails(orderId: number) {
     console.log(JSON.stringify(order.customer, null, 2));
 
     console.log('\nOrder Items:');
-    order.orderItems.forEach((item, index) => {
+    order.orderItems.forEach((item: any, index: any) => {
       console.log(`\nItem ${index + 1}:`);
       console.log(JSON.stringify(item, null, 2));
     });

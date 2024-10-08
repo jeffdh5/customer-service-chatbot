@@ -9,7 +9,7 @@ import { vertexAI } from '@genkit-ai/vertexai';
 // Configure Genkit with necessary plugins
 configureGenkit({
   plugins: [
-    vertexAI({ projectId: 'genkit-cs-example', location: 'us-central1' }),
+    vertexAI({ projectId: 'cloud-llm-preview1', location: 'us-central1' }),
     dotprompt(), // Load the Dotprompt plugin
   ],
   logLevel: 'debug', // Set log level to debug for development

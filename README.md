@@ -32,6 +32,7 @@ Before you begin, make sure you have the following installed:
 
 4. Set up the database:
    ```
+   npx prisma generate
    npx prisma migrate dev
    ```
 

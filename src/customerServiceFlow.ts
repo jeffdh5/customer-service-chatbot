@@ -1,7 +1,7 @@
 import { defineFlow, runFlow } from '@genkit-ai/flow';
 import { promptRef } from '@genkit-ai/dotprompt';
 import { z } from 'zod';
-import { getCustomerByEmail, getOrderById, getProductById, getRecentOrders, getRecentOrdersByEmail, listProducts, createEscalation } from './db';
+import { getCustomerByEmail, getOrderById, getProductById, getRecentOrdersByEmail, listProducts, createEscalation } from './firestoreDb';
 import { executeHandler } from './handlers';
 
 const classifyInquiryPrompt = promptRef('classify_inquiry');
@@ -20,10 +20,18 @@ export const classifyInquiryFlow = defineFlow(
     }),
   },
   async (input) => {
-    const classificationResult = await classifyInquiryPrompt.generate({
-      input: { inquiry: input.inquiry },
-    });
-    return classificationResult.output();
+    try {
+      console.log('Classifying inquiry:', input.inquiry);
+      const classificationResult = await classifyInquiryPrompt.generate({
+        input: { inquiry: input.inquiry },
+      });
+      const output = classificationResult.output();
+      console.log('Classification result:', output);
+      return output;
+    } catch (error) {
+      console.error('Error in classifyInquiryFlow:', error);
+      throw error;
+    }
   }
 );
 
@@ -31,8 +39,17 @@ export const customerServiceFlow = defineFlow(
   {
     name: 'customerServiceFlow',
     inputSchema: z.object({
-      customerInquiry: z.string(),
-      email: z.string(),
+      from: z.string(),
+      to: z.string(),
+      subject: z.string(),
+      body: z.string(),
+      sentAt: z.string(), // Changed from timestamp to sentAt
+      threadHistory: z.array(z.object({
+        from: z.string(),
+        to: z.string(),
+        body: z.string(),
+        sentAt: z.string(), // Changed from timestamp to sentAt
+      })),
     }),
     outputSchema: z.object({
       intent: z.string(),
@@ -45,15 +62,15 @@ export const customerServiceFlow = defineFlow(
   async (input) => {
     // Step 1: Classify the inquiry
     const classificationResult = await runFlow(classifyInquiryFlow, {
-      inquiry: input.customerInquiry,
+      inquiry: input.body,
     });
     const { intent, subintent } = classificationResult;
 
     // Step 2: Augment data
     const augmentedData = await runFlow(augmentInfo, {
       intent,
-      customerInquiry: input.customerInquiry,
-      email: input.email,
+      customerInquiry: input.body,
+      email: input.from,
     });
 
     // Step 3: Execute Handler
@@ -62,13 +79,17 @@ export const customerServiceFlow = defineFlow(
       handlerResult = await runFlow(executeHandlerFlow, {
         intent,
         subintent,
-        inquiry: input.customerInquiry,
-        context: augmentedData.responseData,
+        inquiry: input.body,
+        context: {
+          ...augmentedData.responseData,
+          subject: input.subject,
+          threadHistory: input.threadHistory,
+        },
       });
     } catch (error) {
       // Escalate if no handler
       if (error instanceof Error && error.message.startsWith('NoHandlerPromptError')) {
-        const escalationResult = await escalateToHuman(input.customerInquiry, input.email, 'No handler found');
+        const escalationResult = await escalateToHuman(input.body, input.from, 'No handler found');
         return {
           intent,
           subintent,
@@ -87,8 +108,12 @@ export const customerServiceFlow = defineFlow(
     const responseResult = await runFlow(generateDraftFlow, {
       intent,
       subintent,
-      inquiry: input.customerInquiry,
-      context: augmentedData.responseData,
+      inquiry: input.body,
+      context: {
+        ...augmentedData.responseData,
+        subject: input.subject,
+        threadHistory: input.threadHistory,
+      },
       handlerResult: handlerResult.data,
     });
 
@@ -113,7 +138,7 @@ async function escalateToHuman(inquiry: string, email: string, reason: string) {
     customer.id,
     'Customer Inquiry Escalation',
     `Inquiry: ${inquiry}\n\nReason for escalation: ${reason}`,
-    'medium' // Add a priority level as the fourth argument
+    inquiry
   );
 
   return {
@@ -143,11 +168,10 @@ export const augmentInfo = defineFlow(
         break;
       case 'Product':
         const productInfo = await runFlow(extractInfoFlow, { inquiry: input.customerInquiry });
-        if (productInfo.productId !== 0) {
+        if (productInfo.productId !== "") {
           const product = await getProductById(productInfo.productId);
           responseData = { product };
         } else {
-          // todo: add RAG here
           const products = await listProducts();
           responseData = { products };
         }
@@ -155,18 +179,16 @@ export const augmentInfo = defineFlow(
       case 'Order':
         const orderInfo = await runFlow(extractInfoFlow, { inquiry: input.customerInquiry });
         console.log('Extracted order info:', orderInfo);
-        if (orderInfo.orderId !== 0) {
+        if (orderInfo.orderId !== "") {
           const order = await getOrderById(orderInfo.orderId);
           console.log('Retrieved order:', order);
           responseData = { order };
         } else {
-          // If no specific order ID, fetch recent orders using the email
           const recentOrders = await getRecentOrdersByEmail(input.email);
           responseData = { recentOrders };
         }
         break;
       case 'Other':
-        // For 'Other' intent, we might want to fetch customer information
         const customer = await getCustomerByEmail(input.email);
         responseData = { customer };
         break;
@@ -182,9 +204,9 @@ export const extractInfoFlow = defineFlow(
       inquiry: z.string(),
     }),
     outputSchema: z.object({
-      productId: z.number(),
-      orderId: z.number(),
-      customerId: z.number(),
+      productId: z.string(),
+      orderId: z.string(),
+      customerId: z.string(),
       issue: z.string(),
     }),
   },
@@ -194,10 +216,10 @@ export const extractInfoFlow = defineFlow(
     });
     const output = extractionResult.output();
     return {
-      productId: output.productId && output.productId !== "" ? parseInt(output.productId, 10) : 0,
-      orderId: output.orderId && output.orderId !== "" ? parseInt(output.orderId, 10) : 0,
-      customerId: output.customerId && output.customerId !== "" ? parseInt(output.customerId, 10) : 0,
-      issue: output.issue && output.issue !== "" ? output.issue : "",
+      productId: output.productId || "",
+      orderId: output.orderId || "",
+      customerId: output.customerId || "",
+      issue: output.issue || "",
     };
   }
 );
