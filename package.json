@@ -16,6 +16,7 @@
     "@genkit-ai/core": "^0.5.16",
     "@genkit-ai/dotprompt": "^0.5.16",
     "@genkit-ai/evaluator": "^0.5.16",
+    "@genkit-ai/google-cloud": "^0.5.16",
     "@genkit-ai/googleai": "^0.5.16",
     "@genkit-ai/vertexai": "^0.5.16",
     "@prisma/client": "^4.0.0",

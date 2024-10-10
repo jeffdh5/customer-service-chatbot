@@ -41,6 +41,12 @@ Before you begin, make sure you have the following installed:
    npm run prisma:seed
    ```
 
+6. Run evals
+   ```
+   genkit eval:flow classifyInquiryFlow --input src/classifyInquiryTestInputs.json 
+   genkit eval:flow generateDraftFlow --input src/generateDraftTestInputs.json
+   ```
+
 ## Project Structure
 
 The project is structured as follows:
