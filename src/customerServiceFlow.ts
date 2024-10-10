@@ -1,6 +1,8 @@
 import { defineFlow, runFlow } from '@genkit-ai/flow';
 import { promptRef } from '@genkit-ai/dotprompt';
 import { z } from 'zod';
+// To use firestore, change the import to './firestoreDb';
+// You also need to change the IDs in the schemas to strings instead of numbers
 import { getCustomerByEmail, getOrderById, getProductById, getRecentOrdersByEmail, listProducts, createEscalation } from './db';
 import { executeHandler } from './handlers';
 
