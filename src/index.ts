@@ -12,7 +12,7 @@ configureGenkit({
   plugins: [
     vertexAI({ projectId: 'genkit-devrel-samples', location: 'us-central1' }),
     googleAI(),
-    dotprompt(), // Load the Dotprompt plugin,
+    dotprompt(), 
     genkitEval({
       judge: gemini15Flash,
       metrics: [GenkitMetric.FAITHFULNESS],
@@ -40,11 +40,6 @@ configureGenkit({
     logger: 'googleCloud',
   },
 });
-
-import { customerServiceFlow } from './customerServiceFlow';
-
-// Export the flow(s) you've defined
-export { customerServiceFlow };
 
 // Start the flows server
 startFlowsServer();

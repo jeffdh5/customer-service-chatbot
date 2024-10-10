@@ -1,7 +1,7 @@
 import { defineFlow, runFlow } from '@genkit-ai/flow';
 import { promptRef } from '@genkit-ai/dotprompt';
 import { z } from 'zod';
-import { getCustomerByEmail, getOrderById, getProductById, getRecentOrdersByEmail, listProducts, createEscalation } from './firestoreDb';
+import { getCustomerByEmail, getOrderById, getProductById, getRecentOrdersByEmail, listProducts, createEscalation } from './db';
 import { executeHandler } from './handlers';
 
 const classifyInquiryPrompt = promptRef('classify_inquiry');
@@ -168,7 +168,7 @@ export const augmentInfo = defineFlow(
         break;
       case 'Product':
         const productInfo = await runFlow(extractInfoFlow, { inquiry: input.customerInquiry });
-        if (productInfo.productId !== "") {
+        if (!productInfo.productId) {
           const product = await getProductById(productInfo.productId);
           responseData = { product };
         } else {
@@ -179,7 +179,7 @@ export const augmentInfo = defineFlow(
       case 'Order':
         const orderInfo = await runFlow(extractInfoFlow, { inquiry: input.customerInquiry });
         console.log('Extracted order info:', orderInfo);
-        if (orderInfo.orderId !== "") {
+        if (!orderInfo.orderId) {
           const order = await getOrderById(orderInfo.orderId);
           console.log('Retrieved order:', order);
           responseData = { order };
@@ -204,9 +204,9 @@ export const extractInfoFlow = defineFlow(
       inquiry: z.string(),
     }),
     outputSchema: z.object({
-      productId: z.string(),
-      orderId: z.string(),
-      customerId: z.string(),
+      productId: z.number(),
+      orderId: z.number(),
+      customerId: z.number(),
       issue: z.string(),
     }),
   },
@@ -216,9 +216,9 @@ export const extractInfoFlow = defineFlow(
     });
     const output = extractionResult.output();
     return {
-      productId: output.productId || "",
-      orderId: output.orderId || "",
-      customerId: output.customerId || "",
+      productId: output.productId ? parseInt(output.productId, 10) : 0,
+      orderId: output.orderId ? parseInt(output.orderId, 10) : 0,
+      customerId: output.customerId ? parseInt(output.customerId, 10) : 0,
       issue: output.issue || "",
     };
   }

@@ -1,18 +1,7 @@
 import * as admin from 'firebase-admin';
 
-// Initialize Firebase Admin (you should replace this with your actual config)
-if (!admin.apps.length) {
-	admin.initializeApp({
-		// Your Firebase Admin configuration object
-		// credential: admin.credential.cert(serviceAccount),
-		// databaseURL: 'https://your-project-id.firebaseio.com'
-	});
-}
-
+admin.initializeApp();
 const db = admin.firestore();
-
-// Helper function to convert Firestore timestamp to Date
-const convertTimestamp = (timestamp: any): Date => timestamp.toDate();
 
 export async function getProductById(id: string) {
 	const docRef = db.collection('products').doc(id);
