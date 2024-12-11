@@ -1,16 +1,14 @@
-import { defineFlow, runFlow } from '@genkit-ai/flow';
-import { promptRef } from '@genkit-ai/dotprompt';
-import { z } from 'zod';
-// To use firestore, change the import to './firestoreDb';
-// You also need to change the IDs in the schemas to strings instead of numbers
-import { getCustomerByEmail, getOrderById, getProductById, getRecentOrdersByEmail, listProducts, createEscalation } from './db';
+import { z } from 'genkit';
 import { executeHandler } from './handlers';
+import { createEscalation, getCustomerByEmail, getOrderById, getProductById, getRecentOrdersByEmail, listProducts } from './db';
+import { ai } from '.';
 
-const classifyInquiryPrompt = promptRef('classify_inquiry');
-const generateDraftPrompt = promptRef('generate_draft');
-const extractInfoPrompt = promptRef('extract_info');
+// Define prompts
+const classifyInquiryPrompt = ai.prompt('classify_inquiry');
+const generateDraftPrompt = ai.prompt('generate_draft');
+const extractInfoPrompt = ai.prompt('extract_info');
 
-export const classifyInquiryFlow = defineFlow(
+export const classifyInquiryFlow = ai.defineFlow(
   {
     name: 'classifyInquiryFlow',
     inputSchema: z.object({
@@ -24,12 +22,8 @@ export const classifyInquiryFlow = defineFlow(
   async (input) => {
     try {
       console.log('Classifying inquiry:', input.inquiry);
-      const classificationResult = await classifyInquiryPrompt.generate({
-        input: { inquiry: input.inquiry },
-      });
-      const output = classificationResult.output();
-      console.log('Classification result:', output);
-      return output;
+      const classificationResult = await classifyInquiryPrompt({ inquiry: input.inquiry });
+      return classificationResult.output();
     } catch (error) {
       console.error('Error in classifyInquiryFlow:', error);
       throw error;
@@ -37,7 +31,7 @@ export const classifyInquiryFlow = defineFlow(
   }
 );
 
-export const customerServiceFlow = defineFlow(
+export const customerServiceFlow = ai.defineFlow(
   {
     name: 'customerServiceFlow',
     inputSchema: z.object({
@@ -63,13 +57,11 @@ export const customerServiceFlow = defineFlow(
   },
   async (input) => {
     // Step 1: Classify the inquiry
-    const classificationResult = await runFlow(classifyInquiryFlow, {
-      inquiry: input.body,
-    });
+    const classificationResult = await classifyInquiryFlow({inquiry: input.body});
     const { intent, subintent } = classificationResult;
 
     // Step 2: Augment data
-    const augmentedData = await runFlow(augmentInfo, {
+    const augmentedData = await augmentInfo({
       intent,
       customerInquiry: input.body,
       email: input.from,
@@ -78,7 +70,7 @@ export const customerServiceFlow = defineFlow(
     // Step 3: Execute Handler
     let handlerResult;
     try {
-      handlerResult = await runFlow(executeHandlerFlow, {
+      handlerResult = await executeHandlerFlow({
         intent,
         subintent,
         inquiry: input.body,
@@ -107,7 +99,7 @@ export const customerServiceFlow = defineFlow(
     }
 
     // Step 4: Generate response
-    const responseResult = await runFlow(generateDraftFlow, {
+    const responseResult = await generateDraftFlow({
       intent,
       subintent,
       inquiry: input.body,
@@ -149,7 +141,7 @@ async function escalateToHuman(inquiry: string, email: string, reason: string) {
   };
 }
 
-export const augmentInfo = defineFlow(
+export const augmentInfo = ai.defineFlow(
   {
     name: 'augmentInfoFlow',
     inputSchema: z.object({
@@ -169,7 +161,7 @@ export const augmentInfo = defineFlow(
         responseData = { catalog: products };
         break;
       case 'Product':
-        const productInfo = await runFlow(extractInfoFlow, { inquiry: input.customerInquiry });
+        const productInfo = await extractInfoFlow.run({ inquiry: input.customerInquiry });
         if (!productInfo.productId) {
           const product = await getProductById(productInfo.productId);
           responseData = { product };
@@ -179,7 +171,7 @@ export const augmentInfo = defineFlow(
         }
         break;
       case 'Order':
-        const orderInfo = await runFlow(extractInfoFlow, { inquiry: input.customerInquiry });
+        const orderInfo = await extractInfoFlow.run({ inquiry: input.customerInquiry });
         console.log('Extracted order info:', orderInfo);
         if (!orderInfo.orderId) {
           const order = await getOrderById(orderInfo.orderId);
@@ -199,7 +191,7 @@ export const augmentInfo = defineFlow(
   }
 );
 
-export const extractInfoFlow = defineFlow(
+export const extractInfoFlow = ai.defineFlow(
   {
     name: 'extractInfoFlow',
     inputSchema: z.object({
@@ -213,8 +205,9 @@ export const extractInfoFlow = defineFlow(
     }),
   },
   async (input) => {
-    const extractionResult = await extractInfoPrompt.generate({
-      input: { inquiry: input.inquiry, category: 'Customer Service' },
+    const extractionResult = await extractInfoPrompt({ 
+      inquiry: input.inquiry, 
+      category: 'Customer Service' 
     });
     const output = extractionResult.output();
     return {
@@ -226,7 +219,7 @@ export const extractInfoFlow = defineFlow(
   }
 );
 
-export const executeHandlerFlow = defineFlow(
+export const executeHandlerFlow = ai.defineFlow(
   {
     name: 'executeHandlerFlow',
     inputSchema: z.object({
@@ -246,7 +239,7 @@ export const executeHandlerFlow = defineFlow(
   }
 );
 
-export const generateDraftFlow = defineFlow(
+export const generateDraftFlow = ai.defineFlow(
   {
     name: 'generateDraftFlow',
     inputSchema: z.object({
@@ -261,55 +254,13 @@ export const generateDraftFlow = defineFlow(
     }),
   },
   async (input) => {
-    const responseResult = await generateDraftPrompt.generate({
-      input: {
-        intent: input.intent,
-        subintent: input.subintent,
-        inquiry: input.inquiry,
-        context: JSON.stringify(input.context, null, 2),
-        handlerResult: input.handlerResult,
-      },
+    const responseResult = await generateDraftPrompt({
+      intent: input.intent,
+      subintent: input.subintent,
+      inquiry: input.inquiry,
+      context: JSON.stringify(input.context, null, 2),
+      handlerResult: input.handlerResult,
     });
     return { draftResponse: responseResult.output().draftResponse };
-  }
-);
-
-export const splitInquiriesFlow = defineFlow(
-  {
-    name: 'splitInquiriesFlow',
-    inputSchema: z.object({
-      email: z.string(),
-    }),
-    outputSchema: z.object({
-      inquiries: z.array(z.string()),
-    }),
-  },
-  async (input) => {
-    const splitResult = await promptRef('split_inquiries').generate({
-      input: { email: input.email },
-    });
-    return splitResult.output();
-  }
-);
-
-export const combineResponsesFlow = defineFlow(
-  {
-    name: 'combineResponsesFlow',
-    inputSchema: z.object({
-      originalEmail: z.string(),
-      draftReplies: z.string(),
-    }),
-    outputSchema: z.object({
-      combinedReply: z.string(),
-    }),
-  },
-  async (input) => {
-    const combineResult = await promptRef('combine_responses').generate({
-      input: {
-        originalEmail: input.originalEmail,
-        draftReplies: input.draftReplies,
-      },
-    });
-    return combineResult.output();
   }
 );

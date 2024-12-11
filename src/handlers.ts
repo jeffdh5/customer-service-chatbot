@@ -1,7 +1,7 @@
 import { z } from 'zod';
-import { promptRef } from '@genkit-ai/dotprompt';
 import * as fs from 'fs';
 import * as path from 'path';
+import { ai } from '.';
 
 // Handler concept: A handler is responsible for processing specific intents and subintents in the chatbot.
 // It takes user input, processes it, and generates an appropriate response or action.
@@ -29,7 +29,7 @@ export async function executeHandler(input: HandlerInput): Promise<z.infer<typeo
   const handlerPrompt = getHandlerPrompt(input.intent, input.subintent);
   
   // Generate a response using the handler's prompt
-  const handlerResult = await handlerPrompt.generate({
+  const handlerResult = await handlerPrompt({
     input: {
       inquiry: input.inquiry,
       context: JSON.stringify(input.context, null, 2),
@@ -59,7 +59,7 @@ function getHandlerPrompt(intent: string, subintent: string) {
   
   // Check if the prompt file exists and return it, or throw an error if not found
   if (fs.existsSync(promptPath)) {
-    return promptRef(promptKey);
+    return ai.prompt(promptKey);
   } else {
     throw new Error(`NoHandlerPromptError: No handler prompt found for intent '${intent}' and subintent '${subintent}'`);
   }
