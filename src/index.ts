@@ -1,5 +1,4 @@
-import { genkit } from 'genkit';
-import { z } from 'genkit';
+import { genkit, z } from 'genkit';
 import { executeHandler } from './handlers';
 import { createEscalation, getCustomerByEmail, getOrderById, getProductById, getRecentOrdersByEmail, listProducts } from './db';
 import vertexAI, { gemini10Pro, gemini15Pro, textEmbedding004 } from '@genkit-ai/vertexai';
@@ -18,8 +17,6 @@ export const ai = genkit({
   ],
   model: gemini10Pro
 });
-
-
 
 // Define prompts
 const classifyInquiryPrompt = ai.prompt('classify_inquiry');
