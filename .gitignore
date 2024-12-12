@@ -2,7 +2,7 @@
 node_modules/
 
 # Compiled output
-dist/
+lib/
 build/
 
 # TypeScript cache
@@ -33,3 +33,6 @@ Thumbs.db
 
 # Optional: Uncomment if you're using Jest for testing
 # coverage/
+
+# Genkit generated files
+.genkit

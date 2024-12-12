@@ -37,7 +37,7 @@ export async function executeHandler(input: HandlerInput): Promise<z.infer<typeo
   });
 
   // Process the output from the handler
-  const output = handlerResult.output();
+  const output = handlerResult.output;
 
   // Return the structured result of the handler's execution
   return {

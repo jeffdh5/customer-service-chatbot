@@ -1,6 +1,6 @@
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider = "sqlite"
+  url      = "file:./dev.db"
 }
 
 generator client {
@@ -19,7 +19,7 @@ model Product {
   id          Int          @id @default(autoincrement())
   name        String
   description String
-  price       Decimal
+  price       Float
   sku         String       @unique
   stockLevel  Int
   orderItems  OrderItem[]
@@ -30,17 +30,9 @@ model Order {
   customer   Customer    @relation(fields: [customerId], references: [id])
   customerId Int
   orderDate  DateTime    @default(now())
-  status     OrderStatus @default(PENDING)
+  status     String     @default("PENDING")
   trackingNumber String?
   orderItems OrderItem[]
-}
-
-enum OrderStatus {
-  PENDING
-  PROCESSING
-  SHIPPED
-  DELIVERED
-  CANCELLED
 }
 
 model OrderItem {
@@ -54,21 +46,14 @@ model OrderItem {
   @@unique([orderId, productId])
 }
 
-// Add this enum before the Escalation model
-enum EscalationStatus {
-  OPEN
-  IN_PROGRESS
-  RESOLVED
-}
-
 model Escalation {
-  id          Int              @id @default(autoincrement())
-  customer    Customer         @relation(fields: [customerId], references: [id])
+  id          Int          @id @default(autoincrement())
+  customer    Customer     @relation(fields: [customerId], references: [id])
   customerId  Int
   subject     String
   description String
-  status      EscalationStatus @default(OPEN)
-  createdAt   DateTime         @default(now())
-  updatedAt   DateTime         @updatedAt
+  status      String      @default("OPEN")
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
   threadId    String        
 }

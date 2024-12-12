@@ -27,11 +27,11 @@ output:
       summary:
         type: string
 ---
-You are a customer service AI assistant handling a general question about a specific order. Follow these steps:
+You are a customer service AI assistant handling a general question about a product catalog. Follow these steps:
 
-1. Analyze the customer's inquiry to identify the order in question.
-2. If the order is ambiguous or not specified, ask the customer to confirm before proceeding.
-3. Use the available information about the order to answer the customer's question.
+1. Analyze the customer's inquiry to identify the product or catalog category in question.
+2. If the product or category is ambiguous or not specified, ask the customer to confirm before proceeding.
+3. Use the available catalog information to answer the customer's question.
 4. Provide a clear and concise answer to the customer's question.
 
 Execute as many steps as possible before requiring user input. If you complete all steps, set handlerCompleted to true.

@@ -1,61 +1,144 @@
-
 import { PrismaClient } from '@prisma/client';
-import { faker } from '@faker-js/faker';
 
 const prisma = new PrismaClient();
 
 async function main() {
-  // Seed Products
+
+  // Seed Products with hardcoded values
   const products = [];
-  for (let i = 0; i < 10; i++) {
+  const productData = [
+    {
+      id: 1,
+      name: 'Classic Blue T-Shirt',
+      description: 'Comfortable cotton t-shirt in classic blue',
+      stockLevel: 50,
+      price: 19.99,
+      sku: 'BLU-TSHIRT-M',
+    },
+    {
+      id: 2,
+      name: 'Running Shoes',
+      description: 'Lightweight running shoes with cushioned sole',
+      stockLevel: 25,
+      price: 89.99,
+      sku: 'RUN-SHOE-42',
+    },
+    {
+      name: 'Denim Jeans',
+      description: 'Classic fit denim jeans in dark wash',
+      stockLevel: 75,
+      price: 49.99,
+      sku: 'DEN-JEAN-32',
+    },
+    {
+      name: 'Leather Wallet',
+      description: 'Genuine leather bifold wallet',
+      stockLevel: 100,
+      price: 29.99,
+      sku: 'LEA-WALL-01',
+    },
+    {
+      name: 'Wireless Headphones',
+      description: 'Noise-cancelling wireless headphones',
+      stockLevel: 30,
+      price: 149.99,
+      sku: 'WIR-HEAD-BK',
+    }
+  ];
+
+  for (const data of productData) {
     products.push(
       await prisma.product.create({
-        data: {
-          id: faker.number.int({ min: 1000000, max: 9999999 }),
-          name: faker.commerce.productName(),
-          description: faker.commerce.productDescription(),
-          stockLevel: faker.number.int({ min: 0, max: 1000 }),
-          price: parseFloat(faker.commerce.price()),
-          sku: faker.string.uuid(),
-        }
+        data
       })
     );
   }
 
-  // Seed Customers
+  // Seed Customers with hardcoded values
   const customers = [];
-  for (let i = 0; i < 10; i++) {
+  const customerData = [
+    {
+      id: 1,
+      name: 'John Doe',
+      email: 'john.doe@example.com',
+    },
+    {
+      id: 2,
+      name: 'Jane Smith',
+      email: 'jane.smith@example.com',
+    },
+    {
+      name: 'Bob Wilson',
+      email: 'bob.wilson@example.com',
+    }
+  ];
+
+  for (const data of customerData) {
     customers.push(
       await prisma.customer.create({
-        data: {
-          id: faker.number.int({ min: 1000000, max: 9999999 }),
-          name: faker.person.fullName(),
-          email: faker.internet.email(),
-        },
+        data
       })
     );
   }
 
-  // Seed Orders and OrderItems
-  for (const customer of customers) {
-    const order = await prisma.order.create({
-      data: {
-        id: faker.number.int({ min: 1000000, max: 9999999 }),
-        customerId: customer.id,
-        status: faker.helpers.arrayElement(['PENDING', 'PROCESSING', 'SHIPPED', 'DELIVERED', 'CANCELLED']),
-        trackingNumber: faker.string.alphanumeric(10),
-        orderItems: {
-          create: faker.helpers.arrayElements(products, 3).map((product) => ({
-            id: faker.number.int({ min: 1000000, max: 9999999 }),
-            productId: product.id,
-            quantity: faker.number.int({ min: 1, max: 5 }),
-          })),
-        },
+  // Seed Orders with hardcoded values
+  const orderData = [
+    {
+      customerId: customers[0].id,
+      status: 'DELIVERED',
+      trackingNumber: 'TRACK123456',
+      orderItems: {
+        create: [
+          {
+            productId: products[0].id,
+            quantity: 2,
+          },
+          {
+            productId: products[1].id,
+            quantity: 1,
+          }
+        ],
       },
+    },
+    {
+      customerId: customers[1].id,
+      status: 'PROCESSING',
+      trackingNumber: 'TRACK789012',
+      orderItems: {
+        create: [
+          {
+            productId: products[2].id,
+            quantity: 1,
+          }
+        ],
+      },
+    },
+    {
+      customerId: customers[2].id,
+      status: 'PENDING',
+      trackingNumber: 'TRACK345678',
+      orderItems: {
+        create: [
+          {
+            productId: products[3].id,
+            quantity: 1,
+          },
+          {
+            productId: products[4].id,
+            quantity: 1,
+          }
+        ],
+      },
+    }
+  ];
+
+  for (const data of orderData) {
+    await prisma.order.create({
+      data
     });
   }
 
-  console.log('Database has been seeded.');
+  console.log('Database has been seeded with hardcoded values.');
 }
 
 main()

@@ -1,4 +1,4 @@
-import { PrismaClient, EscalationStatus } from '@prisma/client'
+import { PrismaClient } from '@prisma/client'
 
 const prisma = new PrismaClient()
 
@@ -287,7 +287,7 @@ export async function getEscalationById(id: number) {
  * @param status The new status of the escalation
  * @returns The updated escalation
  */
-export async function updateEscalationStatus(id: number, status: EscalationStatus) {
+export async function updateEscalationStatus(id: number, status: string) {
   try {
     return await prisma.escalation.update({
       where: { id },
