@@ -1,3 +1,6 @@
+# SAMPLE SPECIFIC
+src/prisma/migrations/
+
 # Dependencies
 node_modules/
 

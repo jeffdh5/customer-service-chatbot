@@ -28,14 +28,13 @@ Before you begin, make sure you have the following installed:
 
 2. Install dependencies:
    ```
-   npm install
+   pnpm i
    ```
 
 3. Set up your database:
    a. Set up your environment variables:
       Create a `.env` file in the root directory and add the following:
       ```
-      DATABASE_URL="file:./dev.db"
       PROJECT_ID=[YOUR PROJECT ID]
       LOCATION=[YOUR LOCATION]
       ```
@@ -44,8 +43,9 @@ Before you begin, make sure you have the following installed:
       ```
       cd src/
       npx prisma generate
-      npx prisma migrate dev
+      npx prisma migrate dev --name init
       npm run prisma:seed
+      cd ../
       ```
 
 4. Test the chatbot with sample data
@@ -53,6 +53,9 @@ Before you begin, make sure you have the following installed:
    After seeding the database, you can test the chatbot with these example queries that match our seed data:
 
    ```bash
+   # In a different terminal
+   npm run genkit:dev
+
    # Test the classify inquiry flow to detect intent
    genkit flow:run classifyInquiryFlow '{
      "inquiry": "Is the Classic Blue T-Shirt for $19.99 still in stock?"
@@ -90,8 +93,8 @@ Before you begin, make sure you have the following installed:
 
 5. Run evals
    ```
-   genkit eval:flow classifyInquiryFlow --input src/classifyInquiryTestInputs.json 
-   genkit eval:flow generateDraftFlow --input src/generateDraftTestInputs.json
+   genkit eval:flow classifyInquiryFlow --input evals/classifyInquiryTestInputs.json 
+   genkit eval:flow generateDraftFlow --input evals/generateDraftTestInputs.json
    ```
 
 ## Project Structure

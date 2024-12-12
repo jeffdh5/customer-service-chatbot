@@ -24,6 +24,7 @@ async function main() {
       sku: 'RUN-SHOE-42',
     },
     {
+      id: 3,
       name: 'Denim Jeans',
       description: 'Classic fit denim jeans in dark wash',
       stockLevel: 75,
@@ -31,6 +32,7 @@ async function main() {
       sku: 'DEN-JEAN-32',
     },
     {
+      id: 4,
       name: 'Leather Wallet',
       description: 'Genuine leather bifold wallet',
       stockLevel: 100,
@@ -38,6 +40,7 @@ async function main() {
       sku: 'LEA-WALL-01',
     },
     {
+      id: 5,
       name: 'Wireless Headphones',
       description: 'Noise-cancelling wireless headphones',
       stockLevel: 30,
@@ -68,6 +71,7 @@ async function main() {
       email: 'jane.smith@example.com',
     },
     {
+      id: 3,
       name: 'Bob Wilson',
       email: 'bob.wilson@example.com',
     }
