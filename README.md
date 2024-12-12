@@ -40,14 +40,11 @@ Before you begin, make sure you have the following installed:
       LOCATION=[YOUR LOCATION]
       ```
 
-   b. Set up the database:
+   b. Set up the database and seed with sample data:
       ```
+      cd src/
       npx prisma generate
       npx prisma migrate dev
-      ```
-
-   c. Seed the database with sample data:
-      ```
       npm run prisma:seed
       ```
 
@@ -55,80 +52,13 @@ Before you begin, make sure you have the following installed:
    
    After seeding the database, you can test the chatbot with these example queries that match our seed data:
 
-   ### Test Classification Flow
    ```bash
-   # Product availability queries
+   # Test the classify inquiry flow to detect intent
    genkit flow:run classifyInquiryFlow '{
      "inquiry": "Is the Classic Blue T-Shirt for $19.99 still in stock?"
    }'
 
-   # Order status queries
-   genkit flow:run classifyInquiryFlow '{
-     "inquiry": "What is the status of my order TRACK123456?"
-   }'
-   ```
-
-   ### Test Customer Service Flow
-   ```bash
-   # John Doe's order status (has TRACK123456 with Blue T-Shirt and Running Shoes)
-   genkit flow:run customerServiceFlow '{
-     "from": "john.doe@example.com",
-     "to": "support@company.com",
-     "subject": "Order Status Check",
-     "body": "Can you check the status of my order TRACK123456?",
-     "sentAt": "2024-03-14T12:00:00Z",
-     "threadHistory": []
-   }'
-
-   # Jane Smith's order status (has TRACK789012 with Denim Jeans)
-   genkit flow:run customerServiceFlow '{
-     "from": "jane.smith@example.com",
-     "to": "support@company.com",
-     "subject": "Processing Order Query",
-     "body": "When will my order TRACK789012 be ready?",
-     "sentAt": "2024-03-14T12:00:00Z",
-     "threadHistory": []
-   }'
-
-   # Bob Wilson's pending order (has TRACK345678 with Leather Wallet and Wireless Headphones)
-   genkit flow:run customerServiceFlow '{
-     "from": "bob.wilson@example.com",
-     "to": "support@company.com", 
-     "subject": "New Order Status",
-     "body": "Has my order TRACK345678 shipped yet?",
-     "sentAt": "2024-03-14T12:00:00Z",
-     "threadHistory": []
-   }'
-   ```
-
-   ### Sample Queries by Category
-
-   #### Product Queries (Based on Seeded Products)
-   ```bash
-   # Price checks
-   genkit flow:run customerServiceFlow '{
-     "from": "customer@example.com",
-     "to": "support@company.com",
-     "subject": "Price Check",
-     "body": "How much are the Wireless Headphones?",
-     "sentAt": "2024-03-14T12:00:00Z",
-     "threadHistory": []
-   }'
-
-   # Stock availability
-   genkit flow:run customerServiceFlow '{
-     "from": "customer@example.com",
-     "to": "support@company.com",
-     "subject": "Stock Check",
-     "body": "Do you have Running Shoes (SKU: RUN-SHOE-42) in stock?",
-     "sentAt": "2024-03-14T12:00:00Z",
-     "threadHistory": []
-   }'
-   ```
-
-   #### Catalog Queries (Testing Product Range)
-   ```bash
-   # Full catalog
+   # Test e2e CS flow (generates a email response to the input inquiry)
    genkit flow:run customerServiceFlow '{
      "from": "john.doe@example.com",
      "to": "support@company.com",
@@ -140,6 +70,8 @@ Before you begin, make sure you have the following installed:
    ```
 
    ### Seeded Data Reference
+   The SQLite database comes pre-seeded with some data so that you can
+   easily test out your queries.
 
    #### Products:
    - Classic Blue T-Shirt ($19.99, SKU: BLU-TSHIRT-M)
@@ -185,12 +117,3 @@ If there is no handler, then the flow will escalate the conversation.
 It also gives you the flexibility to control the logic for each handler.
 
 Handlers are modular and extensible, located in `src/handlers/`.
-
-## Database Setup
-
-This project uses PostgreSQL with Prisma as the ORM.
-
-### PostgreSQL Setup
-
-1. Make sure you have PostgreSQL installed and running
-2. Set up your DATABASE_URL in .env:
