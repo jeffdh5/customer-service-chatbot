@@ -1,5 +1,6 @@
 # SAMPLE SPECIFIC
 src/prisma/migrations/
+src/prisma/dev.db
 
 # Dependencies
 node_modules/

@@ -1,14 +1,11 @@
 # Customer Service Chatbot with Genkit
 This project demonstrates how to build a customer service chatbot using Genkit, a powerful AI framework for building conversational applications. The chatbot is designed to handle various customer inquiries related to products, orders, and general catalog questions.
 
-Key features:
-- Uses SQLite as the underlying database for easy setup and portability
-- Implements complex flow logic with conditional branching based on customer intent:
-  - Queries distinct data tables depending on the intent / sub-intent
-- Includes evaluation examples using Genkit's evaluation framework to measure:
-  - Response faithfulness to source data
-  - Answer relevancy to customer questions
-- Ready for deployment on Google Cloud Platform with Vertex AI integration
+This sample demonstrates:
+- Answering questions using a database + LLM
+- Conditional branching based on intent (different data is added to the prompt based on whether the inquiry was an Order vs. Refund vs. Product question)
+- Using an LLM call to escalate the request to a human based on certain conditions
+
 
 ## Prerequisites
 
@@ -66,7 +63,7 @@ Before you begin, make sure you have the following installed:
      "from": "john.doe@example.com",
      "to": "support@company.com",
      "subject": "Product Catalog",
-     "body": "What products do you have under $50?",
+     "body": "Do you guys carry shirts?",
      "sentAt": "2024-03-14T12:00:00Z",
      "threadHistory": []
    }'
@@ -91,11 +88,6 @@ Before you begin, make sure you have the following installed:
    - Bob Wilson (bob.wilson@example.com)
      - Order TRACK345678: 1 Leather Wallet, 1 Wireless Headphones (PENDING)
 
-5. Run evals
-   ```
-   genkit eval:flow classifyInquiryFlow --input evals/classifyInquiryTestInputs.json 
-   genkit eval:flow generateDraftFlow --input evals/generateDraftTestInputs.json
-   ```
 
 ## Project Structure
 
@@ -103,20 +95,5 @@ The project is structured as follows:
 
 - `src/`: Contains the main application code
 - `prisma/`: Contains the Prisma schema and migrations (for PostgreSQL)
-- `prompts/`: Contains the prompt templates for Genkit
+- `flows/`: Contains the various flows for Genkit
 - `scripts/`: Contains utility scripts
-
-## Handler Concept
-
-The chatbot uses a handler-based architecture to process inquiries:
-
-1. Inquiry Classification: Categorizes user inquiries
-2. Response Generation: Creates draft responses based on classification
-3. Human Review (optional): Routes complex inquiries for human review
-
-This allows you to configure the responder to only handle specific intents.
-If there is no handler, then the flow will escalate the conversation.
-
-It also gives you the flexibility to control the logic for each handler.
-
-Handlers are modular and extensible, located in `src/handlers/`.
