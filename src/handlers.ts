@@ -1,7 +1,7 @@
 import { z } from 'genkit';
 import * as fs from 'fs';
 import * as path from 'path';
-import { ai } from '.';
+import { ai } from './config';
 
 // Handler concept: A handler is responsible for processing specific intents and subintents in the chatbot.
 // It takes user input, processes it, and generates an appropriate response or action.
@@ -25,9 +25,12 @@ type HandlerInput = {
 
 // Main function to execute a handler based on the given input
 export async function executeHandler(input: HandlerInput): Promise<z.infer<typeof HandlerResult>> {
+  console.log('Executing handler with input:', input);
+
   // Get the appropriate prompt for the handler based on intent and subintent
   const handlerPrompt = getHandlerPrompt(input.intent, input.subintent);
-  
+  console.log(`Retrieved handler prompt for intent: ${input.intent}, subintent: ${input.subintent}`);
+
   // Generate a response using the handler's prompt
   const handlerResult = await handlerPrompt({
     input: {
@@ -35,18 +38,23 @@ export async function executeHandler(input: HandlerInput): Promise<z.infer<typeo
       context: JSON.stringify(input.context, null, 2),
     },
   });
+  console.log('Handler result generated:', handlerResult);
 
   // Process the output from the handler
   const output = handlerResult.output;
+  console.log('Processed handler output:', output);
 
   // Return the structured result of the handler's execution
-  return {
+  const result = {
     needsUserInput: output.needsUserInput || false,
     nextAction: output.nextAction,
     actionsTaken: output.actionsTaken || [],
     data: output.data || {},
     handlerCompleted: output.handlerCompleted || false,
   };
+  console.log('Returning handler execution result:', result);
+
+  return result;
 }
 
 // Function to retrieve the appropriate prompt for a handler

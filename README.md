@@ -14,7 +14,7 @@ Key features:
 
 Before you begin, make sure you have the following installed:
 
-- Node.js (v14 or later)
+- Node.js (v18 or later)
 - npm (v6 or later)
 - Genkit CLI
 

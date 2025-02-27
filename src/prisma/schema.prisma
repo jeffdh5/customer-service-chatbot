@@ -16,7 +16,7 @@ model Customer {
 }
 
 model Product {
-  id          Int          @id @default(autoincrement())
+  id          Int          @id
   name        String
   description String
   price       Float
