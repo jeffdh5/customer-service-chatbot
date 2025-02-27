@@ -1,34 +1,36 @@
-# Customer Service Chatbot with Genkit
-This project demonstrates how to build a customer service chatbot using Genkit, a powerful AI framework for building conversational applications. The chatbot is designed to handle various customer inquiries related to products, orders, and general catalog questions.
+# Customer Service Email Responder with Genkit
+This sample helps you use AI to take over your business's email customer support. 
+
+These genkit flows take an email as input. If the email is a question that can be answered with AI, the provided flow will run a genkit flow that:
+- classifies the intent
+- extracts relevant IDs from the inquiry
+- loads corresponding data from a SQLite database
+- drafts a response to send back
+
+If the email cannot be answered with AI or requires taking some actions, it will terminate and escalate the inquiry.
 
 This sample demonstrates:
 - Answering questions using a database + LLM
 - Conditional branching based on intent (different data is added to the prompt based on whether the inquiry was an Order vs. Refund vs. Product question)
 - Using an LLM call to escalate the request to a human based on certain conditions
 
-
 ## Prerequisites
 
 Before you begin, make sure you have the following installed:
 
-- Node.js (v18 or later)
-- npm (v6 or later)
-- Genkit CLI
+- Node (v18+)
+- npm
+- Genkit CLI (v1.0+)
 
 ## Getting Started
 
-1. Clone this repository:
-   ```
-   git clone https://github.com/jeffdh5/customer-service-chatbot.git
-   cd customer-service-chatbot
-   ```
 
-2. Install dependencies:
+1. Install dependencies:
    ```
    pnpm i
    ```
 
-3. Set up your database:
+2. Set up your database:
    a. Set up your environment variables:
       Create a `.env` file in the root directory and add the following:
       ```
@@ -45,7 +47,7 @@ Before you begin, make sure you have the following installed:
       cd ../
       ```
 
-4. Test the chatbot with sample data
+3. Test the email responder with sample data
    
    After seeding the database, you can test the chatbot with these example queries that match our seed data:
 
@@ -87,13 +89,3 @@ Before you begin, make sure you have the following installed:
      - Order TRACK789012: 1 Denim Jeans (PROCESSING)
    - Bob Wilson (bob.wilson@example.com)
      - Order TRACK345678: 1 Leather Wallet, 1 Wireless Headphones (PENDING)
-
-
-## Project Structure
-
-The project is structured as follows:
-
-- `src/`: Contains the main application code
-- `prisma/`: Contains the Prisma schema and migrations (for PostgreSQL)
-- `flows/`: Contains the various flows for Genkit
-- `scripts/`: Contains utility scripts
