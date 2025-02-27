@@ -88,12 +88,9 @@ export const customerServiceFlow = ai.defineFlow(
 
 async function escalateToHuman(inquiry: string, email: string, reason: string) {
   const customer = await getCustomerByEmail(email);
-  if (!customer) {
-    throw new Error('Customer not found');
-  }
 
   const escalation = await createEscalation(
-    customer.id,
+    customer ? customer.id : email,
     'Customer Inquiry Escalation',
     `Inquiry: ${inquiry}\n\nReason for escalation: ${reason}`,
     inquiry
